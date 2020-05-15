@@ -21,7 +21,6 @@ import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.WebDriverRunner.closeWebDriver;
 import static com.codeborne.selenide.WebDriverRunner.isChrome;
 import static java.lang.System.nanoTime;
-import static java.lang.Thread.currentThread;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,10 +47,16 @@ class ChromeProfileByFactoryTest extends IntegrationTest {
 
     String log = readFileToString(chromedriverLog, UTF_8);
     assertThat(log).contains("\"excludeSwitches\": [ \"enable-automation\" ]");
-    assertThat(log).contains("\"extensions\": [ \"Q3I");
+    assertThat(log).contains("\"extensions\": [  ]");
     assertThat(log).contains("\"credentials_enable_service\": false");
     assertThat(log).contains("\"download.default_directory\": \"" + downloadsFolder.getAbsolutePath() + "\"");
-    assertThat(log).contains("\"args\": [ \"--proxy-bypass-list=\\u003C-loopback>\", \"--no-sandbox\", \"--disable-3d-apis\" ]");
+
+    if (Configuration.headless) {
+      assertThat(log).contains("\"args\": [ \"--headless\", \"--disable-gpu\", \"--proxy-bypass-list=\\u003C-loopback>\", \"--no-sandbox\", \"--disable-3d-apis\" ]");
+    }
+    else {
+      assertThat(log).contains("\"args\": [ \"--proxy-bypass-list=\\u003C-loopback>\", \"--no-sandbox\", \"--disable-3d-apis\" ]");
+    }
   }
 
   private static class MyFactory extends ChromeDriverFactory {
@@ -68,8 +73,6 @@ class ChromeProfileByFactoryTest extends IntegrationTest {
       options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
       options.addArguments(Arrays.asList("--no-sandbox", "--disable-3d-apis"));
 
-      File extension = new File(currentThread().getContextClassLoader().getResource("get-crx.crx").getPath());
-      options.addExtensions(extension);
       return options;
     }
   }
