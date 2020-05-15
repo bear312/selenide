@@ -10,10 +10,11 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selectors.byText;
@@ -22,11 +23,13 @@ import static com.codeborne.selenide.WebDriverRunner.closeWebDriver;
 import static com.codeborne.selenide.WebDriverRunner.isChrome;
 import static java.lang.System.nanoTime;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Arrays.asList;
 import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assumptions.assumeThat;
 
 class ChromeProfileByFactoryTest extends IntegrationTest {
+  private static final Logger logger = LoggerFactory.getLogger(ChromeProfileByFactoryTest.class);
   private static final File downloadsFolder = new File(Configuration.downloadsFolder);
   private static final File chromedriverLog = new File(downloadsFolder, "chromedriver." + nanoTime());
 
@@ -38,6 +41,7 @@ class ChromeProfileByFactoryTest extends IntegrationTest {
     Configuration.timeout = 1000;
     Configuration.browser = MyFactory.class.getName();
     FileUtils.write(chromedriverLog, "", UTF_8);
+    logger.info("Chrome log: {}", chromedriverLog.getAbsolutePath());
   }
 
   @Test
@@ -51,11 +55,12 @@ class ChromeProfileByFactoryTest extends IntegrationTest {
     assertThat(log).contains("\"credentials_enable_service\": false");
     assertThat(log).contains("\"download.default_directory\": \"" + downloadsFolder.getAbsolutePath() + "\"");
 
+    String arguments = "\"--proxy-bypass-list=\\u003C-loopback>\", \"--no-sandbox\", \"--disable-3d-apis\"";
     if (Configuration.headless) {
-      assertThat(log).contains("\"args\": [ \"--headless\", \"--disable-gpu\", \"--proxy-bypass-list=\\u003C-loopback>\", \"--no-sandbox\", \"--disable-3d-apis\" ]");
+      assertThat(log).contains("\"args\": [ \"--headless\", \"--disable-gpu\", " + arguments + " ]");
     }
     else {
-      assertThat(log).contains("\"args\": [ \"--proxy-bypass-list=\\u003C-loopback>\", \"--no-sandbox\", \"--disable-3d-apis\" ]");
+      assertThat(log).contains("\"args\": [ " + arguments + " ]");
     }
   }
 
@@ -71,7 +76,7 @@ class ChromeProfileByFactoryTest extends IntegrationTest {
     protected ChromeOptions createChromeOptions(Config config, Proxy proxy) {
       ChromeOptions options = super.createChromeOptions(config, proxy);
       options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
-      options.addArguments(Arrays.asList("--no-sandbox", "--disable-3d-apis"));
+      options.addArguments(asList("--no-sandbox", "--disable-3d-apis"));
 
       return options;
     }
