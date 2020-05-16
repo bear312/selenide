@@ -32,9 +32,6 @@ public class DefaultDriverFactory extends AbstractDriverFactory {
   private WebDriver createInstanceOf(String className, Config config, Browser browser, Proxy proxy) {
     try {
       DesiredCapabilities capabilities = createCommonCapabilities(config, browser, proxy);
-      capabilities.setJavascriptEnabled(true);
-      capabilities.setCapability(TAKES_SCREENSHOT, true);
-      capabilities.setCapability(SUPPORTS_ALERTS, true);
 
       Class<?> clazz = Class.forName(className);
       if (WebDriverProvider.class.isAssignableFrom(clazz)) {
