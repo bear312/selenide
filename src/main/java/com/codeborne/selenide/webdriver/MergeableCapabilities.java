@@ -61,13 +61,16 @@ public class MergeableCapabilities extends MutableCapabilities {
     return result;
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "ConstantConditions"})
   private Object merge(Object baseValue, Object extraValue) {
     if (extraValue == null) {
       return baseValue;
     }
     else if (baseValue instanceof List && extraValue instanceof List) {
       return mergeLists((List<Object>) baseValue, (List<Object>) extraValue);
+    }
+    else if (baseValue.getClass().isArray() && extraValue.getClass().isArray()) {
+      return mergeArrays((Object[]) baseValue, (Object[]) extraValue);
     }
     else if (baseValue.getClass() != extraValue.getClass()) {
       throw new IllegalArgumentException("Cannot merge values of different types: " + baseValue + " vs " + extraValue);
@@ -81,6 +84,13 @@ public class MergeableCapabilities extends MutableCapabilities {
     ArrayList<Object> result = new ArrayList<>();
     result.addAll(base);
     result.addAll(extra);
+    return result;
+  }
+
+  private Object[] mergeArrays(Object[] base, Object[] extra) {
+    Object[] result = new Object[base.length + extra.length];
+    System.arraycopy(base, 0, result, 0, base.length);
+    System.arraycopy(extra, 0, result, base.length, extra.length);
     return result;
   }
 }
