@@ -12,8 +12,8 @@ import java.util.Map;
  * A subclass of MutableCapabilities which has fixed `merge` method:
  * it can properly merge all these ChromeOptions etc. with their Maps inside of Maps.
  */
-public class MergableCapabilities extends MutableCapabilities {
-  public MergableCapabilities(Capabilities base, Capabilities extraCapabilities) {
+public class MergeableCapabilities extends MutableCapabilities {
+  public MergeableCapabilities(Capabilities base, Capabilities extraCapabilities) {
     merge(base);
     merge(extraCapabilities);
   }

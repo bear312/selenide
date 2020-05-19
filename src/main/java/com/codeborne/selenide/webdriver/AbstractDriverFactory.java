@@ -43,7 +43,7 @@ abstract class AbstractDriverFactory implements DriverFactory {
     capabilities.setCapability(SUPPORTS_ALERTS, true);
 
     transferCapabilitiesFromSystemProperties(capabilities);
-    return new MergableCapabilities(capabilities, config.browserCapabilities());
+    return new MergeableCapabilities(capabilities, config.browserCapabilities());
   }
 
   protected void transferCapabilitiesFromSystemProperties(DesiredCapabilities currentBrowserCapabilities) {

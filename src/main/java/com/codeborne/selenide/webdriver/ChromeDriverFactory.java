@@ -68,7 +68,7 @@ public class ChromeDriverFactory extends AbstractDriverFactory {
     options.setExperimentalOption("prefs", prefs(config));
     setMobileEmulation(config, options);
 
-    return new MergableCapabilities(options, createCommonCapabilities(config, browser, proxy));
+    return new MergeableCapabilities(options, createCommonCapabilities(config, browser, proxy));
   }
 
   protected List<String> createChromeArguments(Config config, Browser browser) {
